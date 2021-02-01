@@ -37,15 +37,18 @@ get_template <- function(name, css, includes) {
   installed <- as.character(rmarkdown::pandoc_version())
   self_contained <- !(utils::compareVersion(minimum_required, installed) > 0)
 
-  template_file <- paste0(name, ".html")
+  # Are we in RStudioServer?
+  server <- ifelse(Sys.getenv("RS_SERVER_TMP_DIR") == "", FALSE, TRUE)
 
-  rmarkdown::html_document(
-    theme = NULL,
-    self_contained = self_contained,
-    mathjax = NULL,
-    template = system.file("pandoc_templates", template_file, package = "postcards"),
-    css = css,
-    includes = includes,
-    md_extensions = "-autolink_bare_uris"
-  )
+  template_file <- paste0(name, ".html")
+    rmarkdown::html_document(
+      theme = NULL,
+      self_contained = self_contained | server,
+      mathjax = NULL,
+      template = system.file("pandoc_templates", template_file, package = "postcards"),
+      css = css,
+      includes = includes,
+      md_extensions = "-autolink_bare_uris"
+    )
 }
+
